@@ -24,7 +24,7 @@
 
 require(__DIR__ . '/../../../config.php');
 
-global $CFG, $OUPPUT, $PAGE;
+global $CFG, $OUTPUT, $PAGE, $DB, $USER;
 
 require_once($CFG->libdir . '/adminlib.php');
 
@@ -55,17 +55,94 @@ $PAGE->navbar->add(get_string('pluginname', 'tool_pluginvisibility'));
 $formurl = new moodle_url('/admin/tool/pluginvisibility/index.php', ['categoryid' => $categoryid]);
 $mform = new \tool_pluginvisibility\form\manage_visibility_form($formurl, ['categoryid' => $categoryid]);
 
+// Load existing data from database.
+$existingrecords = $DB->get_records('tool_pluginvisibility_hidden', ['categoryid' => $categoryid]);
+
+$formdata = new stdClass();
+$formdata->categoryid = $categoryid;
+$formdata->modules = [];
+$formdata->blocks = [];
+$formdata->applytosubcategories = 0;
+
+if ($existingrecords) {
+    foreach ($existingrecords as $record) {
+        if ($record->plugintype === 'mod') {
+            $formdata->modules[] = $record->pluginname;
+        } else if ($record->plugintype === 'block') {
+            $formdata->blocks[] = $record->pluginname;
+        }
+        // Get applytosubcategories value (should be same for all records in this category).
+        $formdata->applytosubcategories = $record->applytosubcategories;
+    }
+}
+
 // Set default data.
-$mform->set_data(['categoryid' => $categoryid]);
+$mform->set_data($formdata);
 
 // Handle form submission.
 if ($mform->is_cancelled()) {
     redirect(new moodle_url('/course/management.php', ['categoryid' => $categoryid]));
 } else if ($data = $mform->get_data()) {
-    // TODO: Save the data to database (will be implemented later).
+    global $DB, $USER;
 
-    // For now, just show a notification.
-    \core\notification::success(get_string('changessaved'));
+    $timenow = time();
+
+    // Start transaction.
+    $transaction = $DB->start_delegated_transaction();
+
+    try {
+        // Delete existing records for this category.
+        $DB->delete_records('tool_pluginvisibility_hidden', ['categoryid' => $categoryid]);
+
+        // Prepare records to insert.
+        $recordstoinsert = [];
+
+        // Process modules (activities and resources).
+        if (!empty($data->modules)) {
+            foreach ($data->modules as $modulename) {
+                $record = new stdClass();
+                $record->categoryid = $categoryid;
+                $record->plugintype = 'mod';
+                $record->pluginname = $modulename;
+                $record->applytosubcategories = $data->applytosubcategories;
+                $record->timecreated = $timenow;
+                $record->timemodified = $timenow;
+                $record->usermodified = $USER->id;
+                $recordstoinsert[] = $record;
+            }
+        }
+
+        // Process blocks.
+        if (!empty($data->blocks)) {
+            foreach ($data->blocks as $blockname) {
+                $record = new stdClass();
+                $record->categoryid = $categoryid;
+                $record->plugintype = 'block';
+                $record->pluginname = $blockname;
+                $record->applytosubcategories = $data->applytosubcategories;
+                $record->timecreated = $timenow;
+                $record->timemodified = $timenow;
+                $record->usermodified = $USER->id;
+                $recordstoinsert[] = $record;
+            }
+        }
+
+        // Insert all records.
+        foreach ($recordstoinsert as $record) {
+            $DB->insert_record('tool_pluginvisibility_hidden', $record);
+        }
+
+        // Commit transaction.
+        $transaction->allow_commit();
+
+        // Show success message and redirect.
+        \core\notification::success(get_string('changessaved'));
+        redirect(new moodle_url('/admin/tool/pluginvisibility/index.php', ['categoryid' => $categoryid]));
+
+    } catch (Exception $e) {
+        $transaction->rollback($e);
+        \core\notification::error(get_string('error'));
+    }
 }
 
 echo $OUTPUT->header();
