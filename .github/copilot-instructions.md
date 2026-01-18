@@ -31,3 +31,7 @@
 - Before making any code changes, **Copilot must explain exactly what it plans to do** based on your prompt.
 - You must **explicitly confirm** the explanation before Copilot proceeds with generating or modifying code.
 - If the explanation does not match your intent, **revise your prompt** and request clarification before approving changes. 
+
+### Coding Style
+- Always follow Moodle coding style as per the Moodle 5.1 standards.
+- File coding_styles_moodle.html contains the coding style guidelines.

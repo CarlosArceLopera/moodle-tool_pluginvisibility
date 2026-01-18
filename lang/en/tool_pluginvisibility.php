@@ -24,3 +24,7 @@
 
 $string['pluginname'] = 'Plugin visibility';
 $string['privacy:metadata'] = 'The Plugin visibility tool does not store any personal data.';
+$string['managepluginvisibility'] = 'Manage plugin visibility';
+$string['categoryinfo'] = 'Managing plugin visibility for category: {$a}';
+$string['comingsoon'] = 'Plugin visibility management functionality coming soon.';
+$string['tool/pluginvisibility:view'] = 'View and manage plugin visibility';
