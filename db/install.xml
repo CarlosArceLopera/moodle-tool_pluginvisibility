@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="admin/tool/pluginvisibility/db" VERSION="20260118" COMMENT="XMLDB file for Moodle admin/tool/pluginvisibility"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="tool_pluginvisibility_hidden" COMMENT="Stores hidden plugins (activities, resources, blocks) for categories">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="categoryid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The category ID where this setting applies"/>
+        <FIELD NAME="plugintype" TYPE="char" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="The plugin type (mod, block, etc.)"/>
+        <FIELD NAME="pluginname" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" COMMENT="The plugin name (e.g., forum, html)"/>
+        <FIELD NAME="applytosubcategories" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Whether to apply this setting to subcategories (0=no, 1=yes)"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Timestamp when the record was created"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Timestamp when the record was last modified"/>
+        <FIELD NAME="usermodified" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="User ID who last modified this record"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="usermodified" TYPE="foreign" FIELDS="usermodified" REFTABLE="user" REFFIELDS="id"/>
+        <KEY NAME="categoryid" TYPE="foreign" FIELDS="categoryid" REFTABLE="course_categories" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="categoryid_idx" UNIQUE="false" FIELDS="categoryid" COMMENT="Index on categoryid for quick lookups"/>
+        <INDEX NAME="applytosubcategories_idx" UNIQUE="false" FIELDS="applytosubcategories" COMMENT="Index on applytosubcategories for recursion queries"/>
+        <INDEX NAME="plugintype_pluginname_idx" UNIQUE="false" FIELDS="plugintype, pluginname" COMMENT="Index for plugin lookups"/>
+        <INDEX NAME="category_plugin_idx" UNIQUE="true" FIELDS="categoryid, plugintype, pluginname" COMMENT="Unique index to prevent duplicate entries for the same category and plugin"/>
+      </INDEXES>
+    </TABLE>
+  </TABLES>
+</XMLDB>
