@@ -42,10 +42,7 @@ class helper {
     public static function get_hidden_plugins_for_course($courseid) {
         global $DB;
 
-        // Get the course.
         $course = $DB->get_record('course', ['id' => $courseid], '*', MUST_EXIST);
-
-        // Get the category.
         $category = \core_course_category::get($course->category);
 
         return self::get_hidden_plugins_for_category($category->id);
@@ -63,13 +60,10 @@ class helper {
         $hiddenmodules = [];
         $hiddenblocks = [];
 
-        // Get the category path (from root to current category).
         $category = \core_course_category::get($categoryid);
-        $categorypath = array_reverse($category->get_parents()); // Get parents from root to immediate parent.
-        $categorypath[] = $categoryid; // Add current category.
+        $categorypath = array_reverse($category->get_parents());
+        $categorypath[] = $categoryid;
 
-        // Query for hidden plugins in the category path.
-        // We need to check each category in the path, considering applytosubcategories flag.
         list($insql, $params) = $DB->get_in_or_equal($categorypath, SQL_PARAMS_NAMED);
 
         $sql = "SELECT *
@@ -79,20 +73,14 @@ class helper {
 
         $records = $DB->get_records_sql($sql, $params);
 
-        // Process records considering the hierarchy.
-        $processedcategories = [];
-
         foreach ($categorypath as $catid) {
             foreach ($records as $record) {
                 if ($record->categoryid == $catid) {
-                    // Check if this setting should apply.
                     $shouldapply = false;
 
                     if ($catid == $categoryid) {
-                        // This is the current category, always apply.
                         $shouldapply = true;
                     } else if ($record->applytosubcategories == 1) {
-                        // This is a parent category with recursion enabled.
                         $shouldapply = true;
                     }
 

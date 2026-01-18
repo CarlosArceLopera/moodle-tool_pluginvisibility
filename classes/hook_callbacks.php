@@ -48,19 +48,16 @@ class hook_callbacks {
             $PAGE->requires->js_call_amd('tool_pluginvisibility/category_actions', 'init');
         }
 
-        // Load activity filter on course pages.
+        // Load filters on course pages.
         if ($PAGE->context && $PAGE->context->contextlevel == CONTEXT_COURSE && $COURSE->id > 1) {
-            // Get hidden modules for this course.
-            $hiddenmodules = \tool_pluginvisibility\helper::get_hidden_modules_for_course($COURSE->id);
+            $hiddenplugins = \tool_pluginvisibility\helper::get_hidden_plugins_for_course($COURSE->id);
 
+            if (!empty($hiddenplugins['mod'])) {
+                $PAGE->requires->js_call_amd('tool_pluginvisibility/activity_filter', 'init', [$hiddenplugins['mod']]);
+            }
 
-            if (!empty($hiddenmodules)) {
-                // Inject JavaScript to hide activities.
-                $PAGE->requires->js_call_amd(
-                    'tool_pluginvisibility/activity_filter',
-                    'init',
-                    [$hiddenmodules]
-                );
+            if (!empty($hiddenplugins['block'])) {
+                $PAGE->requires->js_call_amd('tool_pluginvisibility/block_filter', 'init', [$hiddenplugins['block']]);
             }
         }
     }
