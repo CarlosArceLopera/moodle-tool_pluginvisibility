@@ -23,6 +23,9 @@
  */
 
 require(__DIR__ . '/../../../config.php');
+
+global $CFG, $OUPPUT, $PAGE;
+
 require_once($CFG->libdir . '/adminlib.php');
 
 // Get category ID parameter.
@@ -48,13 +51,32 @@ $PAGE->navbar->add(get_string('categories'), new moodle_url('/course/index.php')
 $PAGE->navbar->add($category->get_formatted_name(), new moodle_url('/course/management.php', ['categoryid' => $categoryid]));
 $PAGE->navbar->add(get_string('pluginname', 'tool_pluginvisibility'));
 
+// Instantiate the form.
+$formurl = new moodle_url('/admin/tool/pluginvisibility/index.php', ['categoryid' => $categoryid]);
+$mform = new \tool_pluginvisibility\form\manage_visibility_form($formurl, ['categoryid' => $categoryid]);
+
+// Set default data.
+$mform->set_data(['categoryid' => $categoryid]);
+
+// Handle form submission.
+if ($mform->is_cancelled()) {
+    redirect(new moodle_url('/course/management.php', ['categoryid' => $categoryid]));
+} else if ($data = $mform->get_data()) {
+    // TODO: Save the data to database (will be implemented later).
+
+    // For now, just show a notification.
+    \core\notification::success(get_string('changessaved'));
+}
+
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('managepluginvisibility', 'tool_pluginvisibility'));
 
-// Display category information.
-echo html_writer::tag('p', get_string('categoryinfo', 'tool_pluginvisibility', $category->get_formatted_name()));
+// Display instructions using Mustache template.
+echo $OUTPUT->render_from_template('tool_pluginvisibility/instructions', [
+    'categoryname' => $category->get_formatted_name(),
+]);
 
-// TODO: Add plugin visibility management functionality here.
-echo html_writer::tag('div', get_string('comingsoon', 'tool_pluginvisibility'), ['class' => 'alert alert-info']);
+// Display the form.
+$mform->display();
 
 echo $OUTPUT->footer();

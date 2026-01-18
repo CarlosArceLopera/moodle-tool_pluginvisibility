@@ -26,5 +26,21 @@ $string['pluginname'] = 'Plugin visibility';
 $string['privacy:metadata'] = 'The Plugin visibility tool does not store any personal data.';
 $string['managepluginvisibility'] = 'Manage plugin visibility';
 $string['categoryinfo'] = 'Managing plugin visibility for category: {$a}';
-$string['comingsoon'] = 'Plugin visibility management functionality coming soon.';
 $string['tool/pluginvisibility:view'] = 'View and manage plugin visibility';
+
+// Form strings.
+$string['applytosubcategories'] = 'Apply to all subcategories';
+$string['applytosubcategories_help'] = 'When enabled, the plugin visibility settings will also apply to all subcategories within this category.';
+$string['activitiesandresources'] = 'Activities and Resources';
+$string['activitiesandresources_help'] = 'Select the activity modules and resources that will NOT be visible to users in this category.';
+$string['blocks'] = 'Blocks';
+$string['blocks_help'] = 'Select the blocks that will NOT be visible to users in this category.';
+$string['noselection'] = 'No selection';
+
+// Instructions.
+$string['instructions_heading'] = 'Plugin Visibility Management';
+$string['instructions_text'] = 'Use this page to manage which plugins are hidden from users in the category: {$a}';
+$string['instructions_bullet1'] = 'Select activities, resources, and blocks that you want to HIDE from users in this category';
+$string['instructions_bullet2'] = 'Hidden plugins will not appear in the activity chooser or block drawer for courses in this category';
+$string['instructions_bullet3'] = 'You can optionally apply these settings to all subcategories';
+
