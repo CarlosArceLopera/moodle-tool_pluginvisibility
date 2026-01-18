@@ -41,11 +41,27 @@ class hook_callbacks {
     public static function before_standard_top_of_body_html(
         \core\hook\output\before_standard_top_of_body_html_generation $hook
     ): void {
-        global $PAGE;
+        global $PAGE, $COURSE;
 
         // Only load on course management page.
         if (strpos($PAGE->url->get_path(), '/course/management.php') !== false) {
             $PAGE->requires->js_call_amd('tool_pluginvisibility/category_actions', 'init');
+        }
+
+        // Load activity filter on course pages.
+        if ($PAGE->context && $PAGE->context->contextlevel == CONTEXT_COURSE && $COURSE->id > 1) {
+            // Get hidden modules for this course.
+            $hiddenmodules = \tool_pluginvisibility\helper::get_hidden_modules_for_course($COURSE->id);
+
+
+            if (!empty($hiddenmodules)) {
+                // Inject JavaScript to hide activities.
+                $PAGE->requires->js_call_amd(
+                    'tool_pluginvisibility/activity_filter',
+                    'init',
+                    [$hiddenmodules]
+                );
+            }
         }
     }
 }
