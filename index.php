@@ -62,6 +62,7 @@ $formdata = new stdClass();
 $formdata->categoryid = $categoryid;
 $formdata->modules = [];
 $formdata->blocks = [];
+$formdata->tinymceplugins = [];
 $formdata->applytosubcategories = 0;
 
 if ($existingrecords) {
@@ -70,6 +71,8 @@ if ($existingrecords) {
             $formdata->modules[] = $record->pluginname;
         } else if ($record->plugintype === 'block') {
             $formdata->blocks[] = $record->pluginname;
+        } else if ($record->plugintype === 'tiny') {
+            $formdata->tinymceplugins[] = $record->pluginname;
         }
         // Get applytosubcategories value (should be same for all records in this category).
         $formdata->applytosubcategories = $record->applytosubcategories;
@@ -119,6 +122,21 @@ if ($mform->is_cancelled()) {
                 $record->categoryid = $categoryid;
                 $record->plugintype = 'block';
                 $record->pluginname = $blockname;
+                $record->applytosubcategories = $data->applytosubcategories;
+                $record->timecreated = $timenow;
+                $record->timemodified = $timenow;
+                $record->usermodified = $USER->id;
+                $recordstoinsert[] = $record;
+            }
+        }
+
+        // Process TinyMCE plugins.
+        if (!empty($data->tinymceplugins)) {
+            foreach ($data->tinymceplugins as $tinymceplugin) {
+                $record = new stdClass();
+                $record->categoryid = $categoryid;
+                $record->plugintype = 'tiny';
+                $record->pluginname = $tinymceplugin;
                 $record->applytosubcategories = $data->applytosubcategories;
                 $record->timecreated = $timenow;
                 $record->timemodified = $timenow;

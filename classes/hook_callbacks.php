@@ -60,5 +60,15 @@ class hook_callbacks {
                 $PAGE->requires->js_call_amd('tool_pluginvisibility/block_filter', 'init', [$hiddenplugins['block']]);
             }
         }
+
+        // Load TinyMCE filter on any page within a course context (including module pages).
+        // This covers course view, activity edit pages, etc.
+        if ($COURSE && $COURSE->id > 1) {
+            $hiddenplugins = \tool_pluginvisibility\helper::get_hidden_plugins_for_course($COURSE->id);
+
+            if (!empty($hiddenplugins['tiny'])) {
+                $PAGE->requires->js_call_amd('tool_pluginvisibility/tinymce_filter', 'init', [$hiddenplugins['tiny']]);
+            }
+        }
     }
 }

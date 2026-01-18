@@ -84,6 +84,20 @@ class manage_visibility_form extends \moodleform {
         );
         $mform->addHelpButton('blocks', 'blocks', 'tool_pluginvisibility');
 
+        // TinyMCE plugins - Autocomplete multi-select.
+        $tinymceplugins = $this->get_tinymce_plugins();
+        $mform->addElement(
+            'autocomplete',
+            'tinymceplugins',
+            get_string('tinymceplugins', 'tool_pluginvisibility'),
+            $tinymceplugins,
+            [
+                'multiple' => true,
+                'noselectionstring' => get_string('noselection', 'tool_pluginvisibility'),
+            ]
+        );
+        $mform->addHelpButton('tinymceplugins', 'tinymceplugins', 'tool_pluginvisibility');
+
         // Action buttons.
         $this->add_action_buttons(true, get_string('savechanges'));
     }
@@ -128,6 +142,27 @@ class manage_visibility_form extends \moodleform {
         asort($blocks);
 
         return $blocks;
+    }
+
+    /**
+     * Get list of TinyMCE plugins.
+     *
+     * @return array Array of TinyMCE plugin names keyed by plugin name
+     */
+    protected function get_tinymce_plugins() {
+        $plugins = [];
+        $plugininfo = \core_plugin_manager::instance()->get_plugins_of_type('tiny');
+
+        foreach ($plugininfo as $pluginname => $plugin) {
+            if ($plugin->is_enabled()) {
+                $plugins[$pluginname] = $plugin->displayname;
+            }
+        }
+
+        // Sort alphabetically by display name.
+        asort($plugins);
+
+        return $plugins;
     }
 
     /**

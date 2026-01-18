@@ -59,6 +59,7 @@ class helper {
 
         $hiddenmodules = [];
         $hiddenblocks = [];
+        $hiddentinymce = [];
 
         $category = \core_course_category::get($categoryid);
         $categorypath = array_reverse($category->get_parents());
@@ -89,6 +90,8 @@ class helper {
                             $hiddenmodules[$record->pluginname] = $record->pluginname;
                         } else if ($record->plugintype === 'block') {
                             $hiddenblocks[$record->pluginname] = $record->pluginname;
+                        } else if ($record->plugintype === 'tiny') {
+                            $hiddentinymce[$record->pluginname] = $record->pluginname;
                         }
                     }
                 }
@@ -98,6 +101,7 @@ class helper {
         return [
             'mod' => array_values($hiddenmodules),
             'block' => array_values($hiddenblocks),
+            'tiny' => array_values($hiddentinymce),
         ];
     }
 
