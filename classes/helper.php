@@ -49,10 +49,10 @@ class helper {
     }
 
     /**
-     * Get hidden plugins for a specific category, considering parent categories with recursion.
+     * Get hidden plugins for a specific category.
      *
      * @param int $categoryid The category ID
-     * @return array Array of hidden plugin names grouped by type ['mod' => [...], 'block' => [...]]
+     * @return array Array of hidden plugin names grouped by type ['mod' => [...], 'block' => [...], 'tiny' => [...]]
      */
     public static function get_hidden_plugins_for_category($categoryid) {
         global $DB;
@@ -61,40 +61,16 @@ class helper {
         $hiddenblocks = [];
         $hiddentinymce = [];
 
-        $category = \core_course_category::get($categoryid);
-        $categorypath = array_reverse($category->get_parents());
-        $categorypath[] = $categoryid;
+        // Get all records for this specific category.
+        $records = $DB->get_records('tool_pluginvisibility_hidden', ['categoryid' => $categoryid]);
 
-        list($insql, $params) = $DB->get_in_or_equal($categorypath, SQL_PARAMS_NAMED);
-
-        $sql = "SELECT *
-                  FROM {tool_pluginvisibility_hidden}
-                 WHERE categoryid $insql
-              ORDER BY categoryid ASC";
-
-        $records = $DB->get_records_sql($sql, $params);
-
-        foreach ($categorypath as $catid) {
-            foreach ($records as $record) {
-                if ($record->categoryid == $catid) {
-                    $shouldapply = false;
-
-                    if ($catid == $categoryid) {
-                        $shouldapply = true;
-                    } else if ($record->applytosubcategories == 1) {
-                        $shouldapply = true;
-                    }
-
-                    if ($shouldapply) {
-                        if ($record->plugintype === 'mod') {
-                            $hiddenmodules[$record->pluginname] = $record->pluginname;
-                        } else if ($record->plugintype === 'block') {
-                            $hiddenblocks[$record->pluginname] = $record->pluginname;
-                        } else if ($record->plugintype === 'tiny') {
-                            $hiddentinymce[$record->pluginname] = $record->pluginname;
-                        }
-                    }
-                }
+        foreach ($records as $record) {
+            if ($record->plugintype === 'mod') {
+                $hiddenmodules[$record->pluginname] = $record->pluginname;
+            } else if ($record->plugintype === 'block') {
+                $hiddenblocks[$record->pluginname] = $record->pluginname;
+            } else if ($record->plugintype === 'tiny') {
+                $hiddentinymce[$record->pluginname] = $record->pluginname;
             }
         }
 

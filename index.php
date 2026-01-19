@@ -94,54 +94,67 @@ if ($mform->is_cancelled()) {
     $transaction = $DB->start_delegated_transaction();
 
     try {
-        // Delete existing records for this category.
-        $DB->delete_records('tool_pluginvisibility_hidden', ['categoryid' => $categoryid]);
+        // Get list of categories to update.
+        $categoriestoprocess = [$categoryid];
 
-        // Prepare records to insert.
+        // If applytosubcategories is enabled, get all subcategories.
+        if ($data->applytosubcategories == 1) {
+            $category = \core_course_category::get($categoryid);
+            $subcategories = $category->get_all_children_ids();
+            $categoriestoprocess = array_merge($categoriestoprocess, $subcategories);
+        }
+
+        // Delete existing records for all affected categories.
+        list($insql, $params) = $DB->get_in_or_equal($categoriestoprocess, SQL_PARAMS_NAMED);
+        $DB->delete_records_select('tool_pluginvisibility_hidden', "categoryid $insql", $params);
+
+        // Prepare records to insert for each category.
         $recordstoinsert = [];
 
-        // Process modules (activities and resources).
-        if (!empty($data->modules)) {
-            foreach ($data->modules as $modulename) {
-                $record = new stdClass();
-                $record->categoryid = $categoryid;
-                $record->plugintype = 'mod';
-                $record->pluginname = $modulename;
-                $record->applytosubcategories = $data->applytosubcategories;
-                $record->timecreated = $timenow;
-                $record->timemodified = $timenow;
-                $record->usermodified = $USER->id;
-                $recordstoinsert[] = $record;
+        foreach ($categoriestoprocess as $catid) {
+            // Process modules (activities and resources).
+            if (!empty($data->modules)) {
+                foreach ($data->modules as $modulename) {
+                    $record = new stdClass();
+                    $record->categoryid = $catid;
+                    $record->plugintype = 'mod';
+                    $record->pluginname = $modulename;
+                    $record->applytosubcategories = $data->applytosubcategories;
+                    $record->timecreated = $timenow;
+                    $record->timemodified = $timenow;
+                    $record->usermodified = $USER->id;
+                    $recordstoinsert[] = $record;
+                }
             }
-        }
 
-        // Process blocks.
-        if (!empty($data->blocks)) {
-            foreach ($data->blocks as $blockname) {
-                $record = new stdClass();
-                $record->categoryid = $categoryid;
-                $record->plugintype = 'block';
-                $record->pluginname = $blockname;
-                $record->applytosubcategories = $data->applytosubcategories;
-                $record->timecreated = $timenow;
-                $record->timemodified = $timenow;
-                $record->usermodified = $USER->id;
-                $recordstoinsert[] = $record;
+            // Process blocks.
+            if (!empty($data->blocks)) {
+                foreach ($data->blocks as $blockname) {
+                    $record = new stdClass();
+                    $record->categoryid = $catid;
+                    $record->plugintype = 'block';
+                    $record->pluginname = $blockname;
+                    $record->applytosubcategories = $data->applytosubcategories;
+                    $record->timecreated = $timenow;
+                    $record->timemodified = $timenow;
+                    $record->usermodified = $USER->id;
+                    $recordstoinsert[] = $record;
+                }
             }
-        }
 
-        // Process TinyMCE plugins.
-        if (!empty($data->tinymceplugins)) {
-            foreach ($data->tinymceplugins as $tinymceplugin) {
-                $record = new stdClass();
-                $record->categoryid = $categoryid;
-                $record->plugintype = 'tiny';
-                $record->pluginname = $tinymceplugin;
-                $record->applytosubcategories = $data->applytosubcategories;
-                $record->timecreated = $timenow;
-                $record->timemodified = $timenow;
-                $record->usermodified = $USER->id;
-                $recordstoinsert[] = $record;
+            // Process TinyMCE plugins.
+            if (!empty($data->tinymceplugins)) {
+                foreach ($data->tinymceplugins as $tinymceplugin) {
+                    $record = new stdClass();
+                    $record->categoryid = $catid;
+                    $record->plugintype = 'tiny';
+                    $record->pluginname = $tinymceplugin;
+                    $record->applytosubcategories = $data->applytosubcategories;
+                    $record->timecreated = $timenow;
+                    $record->timemodified = $timenow;
+                    $record->usermodified = $USER->id;
+                    $recordstoinsert[] = $record;
+                }
             }
         }
 
