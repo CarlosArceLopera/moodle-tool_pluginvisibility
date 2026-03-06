@@ -26,7 +26,7 @@ $string['pluginname'] = 'Plugin visibility';
 $string['privacy:metadata'] = 'The Plugin visibility tool does not store any personal data.';
 $string['managepluginvisibility'] = 'Manage plugin visibility';
 $string['categoryinfo'] = 'Managing plugin visibility for category: {$a}';
-$string['tool/pluginvisibility:view'] = 'View and manage plugin visibility';
+$string['pluginvisibility:view'] = 'View and manage plugin visibility';
 
 // Form strings.
 $string['applytosubcategories'] = 'Apply to all subcategories';
