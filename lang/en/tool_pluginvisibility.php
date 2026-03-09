@@ -27,6 +27,22 @@ $string['privacy:metadata'] = 'The Plugin visibility tool does not store any per
 $string['managepluginvisibility'] = 'Manage plugin visibility';
 $string['categoryinfo'] = 'Managing plugin visibility for category: {$a}';
 $string['pluginvisibility:view'] = 'View and manage plugin visibility';
+$string['privacy:metadata:tool_pluginvisibility_hidden'] =
+    'Stores configuration about hidden plugins per course category.';
+$string['privacy:metadata:tool_pluginvisibility_hidden:applytosubcategories'] =
+    'Whether the rule applies to subcategories.';
+$string['privacy:metadata:tool_pluginvisibility_hidden:categoryid'] =
+    'The course category where the plugin visibility rule applies.';
+$string['privacy:metadata:tool_pluginvisibility_hidden:pluginname'] =
+    'The name of the plugin being hidden.';
+$string['privacy:metadata:tool_pluginvisibility_hidden:plugintype'] =
+    'The type of plugin being hidden (e.g., mod, block).';
+$string['privacy:metadata:tool_pluginvisibility_hidden:timecreated'] =
+    'The time when the record was created.';
+$string['privacy:metadata:tool_pluginvisibility_hidden:timemodified'] =
+    'The time when the record was modified.';
+$string['privacy:metadata:tool_pluginvisibility_hidden:usermodified'] =
+    'The ID of the user who last modified this configuration.';
 
 // Form strings.
 $string['applytosubcategories'] = 'Apply to all subcategories';
@@ -45,4 +61,3 @@ $string['instructions_text'] = 'Use this page to manage which plugins are hidden
 $string['instructions_bullet1'] = 'Select activities, resources, blocks, and TinyMCE editor plugins that you want to HIDE from users in this category';
 $string['instructions_bullet2'] = 'Hidden plugins will not appear in the activity chooser, block drawer, or TinyMCE toolbar for courses in this category';
 $string['instructions_bullet3'] = 'You can optionally apply these settings to all subcategories';
-
